@@ -1,25 +1,27 @@
 %option noyywrap
-%option yylineno
 
 %{
     #include <stdio.h>
     #include <stdlib.h>
+    #include "./utils/countCharacter/countCharacter.c"
     int line = 1;
+    int errors = 0;
 %}
 
 /* Declaração de expressões regulares */
 
-id      [a-zA-Z_][a-zA-Z0-9_]*
-natural [0-9]+
-inteiro "-"?{natural}
-real    {inteiro}["."{natural}]
+id                               [a-zA-Z_][a-zA-Z0-9_]*
+natural                          [0-9][1-9]*
+digito                           [0-9]*
+inteiro                          "-"?{natural}
+real                             {inteiro}"."?{digito}?
 
 %%
 \n                               { line++; printf("\n"); }
 \t                               { /* IGNORAR TABULAÇÃO */ }
 [ ]                              { /* IGNORAR ESPAÇOS EM BRANCO */ }
 "{".*"}"                         { /* IGNORAR COMENTÁRIO DE UM LINHA */ }
-"{"[^}]*"}"                      { line += 2; /* IGNORAR COMENTÁRIO MULTILINHA */ }
+"{"[^}]*"}"                      { line += countCharacter(yytext, '\n'); /* IGNORAR COMENTÁRIO MULTILINHA */ }
 
 "programa"                       { printf("<PROG, %d>", line); }
 "inicio"                         { printf("<BEGGIN, %d>", line); }
@@ -69,6 +71,9 @@ real    {inteiro}["."{natural}]
 "e"                              { printf("<EXP, %d>", line); }
 
 {id}                             { printf("<ID, %d>", line); }
+
+.                                { errors++; printf("<ERROR, %d>", line); }
+([0-9]*[a-zA-Z_]+[0-9]*)+        { errors++; printf("<ERROR, %d>", line); }
 %%
 
 int main(){
