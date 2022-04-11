@@ -12,15 +12,15 @@
 /* Declaração de expressões regulares */
 
 id                               [a-zA-Z_][a-zA-Z0-9_]*
-natural                          [0-9][1-9]*
+natural                          [1-9][1-9]*
 digito                           [0-9]*
-inteiro                          "-"?{natural}
+inteiro                          "-"?{digito}
 real                             {inteiro}"."?{digito}?
 
 /* Validação das expressões regulares */
 
 %%
-\n                               { line++; }
+\n                               { line++; printf("\n"); }
 \t                               { /* IGNORAR TABULAÇÃO */ }
 [ ]                              { /* IGNORAR ESPAÇOS EM BRANCO */ }
 "{".*"}"                         { /* IGNORAR COMENTÁRIO DE UM LINHA */ }
@@ -80,7 +80,7 @@ real                             {inteiro}"."?{digito}?
 %%
 
 int main(){
-    char *inputFile = "input";
+    char *inputFile = "input.dgf";
 
     FILE *file = fopen(inputFile, "r");
 
