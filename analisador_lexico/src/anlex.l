@@ -4,6 +4,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "./utils/countCharacter/countCharacter.c"
+
     int line = 1;
     int errors = 0;
 %}
@@ -16,8 +17,10 @@ digito                           [0-9]*
 inteiro                          "-"?{natural}
 real                             {inteiro}"."?{digito}?
 
+/* Validação das expressões regulares */
+
 %%
-\n                               { line++; printf("\n"); }
+\n                               { line++; }
 \t                               { /* IGNORAR TABULAÇÃO */ }
 [ ]                              { /* IGNORAR ESPAÇOS EM BRANCO */ }
 "{".*"}"                         { /* IGNORAR COMENTÁRIO DE UM LINHA */ }
@@ -30,10 +33,6 @@ real                             {inteiro}"."?{digito}?
 "var"                            { printf("<VAR, %d>", line); }
 ":="                             { printf("<ATRIB, %d>", line); }
 ":"                              { printf("<DOUBDOT, %d>", line); }
-"verdadeiro"                     { printf("<TRUE, %d>", line); }
-"falso"                          { printf("<FALSE, %d>", line); }
-"nao"                            { printf("<NOT, %d>", line); }
-
 ";"                              { printf("<SEMICON, %d>", line); }
 ","                              { printf("<COL, %d>", line); }
 
@@ -44,12 +43,16 @@ real                             {inteiro}"."?{digito}?
 "enquanto"                       { printf("<WHILE, %d>", line); }
 "faca"                           { printf("<DO, %d>", line); }
 
-{natural}                        { printf("<NUM, %d>", line); }                   
-{inteiro}                        { printf("<NUM, %d>", line); }
-{real}                           { printf("<NUM, %d>", line); }
 "inteiro"                        { printf("<INT, %d>", line); }
 "real"                           { printf("<FLOAT, %d>", line); }
 "booleano"                       { printf("<BOOL, %d>", line); }
+
+{natural}                        { printf("<NUM, %d>", line); }                   
+{inteiro}                        { printf("<NUM, %d>", line); }
+{real}                           { printf("<NUM, %d>", line); }
+"verdadeiro"                     { printf("<TRUE, %d>", line); }
+"falso"                          { printf("<FALSE, %d>", line); }
+"nao"                            { printf("<NOT, %d>", line); }
 
 "leia"                           { printf("<READ, %d>", line); }
 "escreva"                        { printf("<WRITE, %d>", line); }
@@ -77,16 +80,21 @@ real                             {inteiro}"."?{digito}?
 %%
 
 int main(){
-    FILE *file = fopen("input.dgf", "r");
+    char *inputFile = "input.dgf";
+
+    FILE *file = fopen(inputFile, "r");
 
     if(!file){
-        printf("Arquivo não encontrado");
+        printf("\n\n* 📂 ARQUIVO '%s' NÃO ENCONTRADO\n\n", inputFile);
         return -1;
     }
 
     yyin = file;
-
+    
+    printf("\n\n*\033[0;32m\033[1m 🎉 ANÁLISE LÉXICA CONCLUÍDA\n");
+    printf("\033[0;37m*\033[0;33m\033[1m ✅ LISTA DE TOKENS GERADA: \033[0;37m \033[0m\n");
     yylex();
-
+    printf("\n*\033[0;31m\033[1m ❌ ERROS LÉXICOS ENCONTRADOS: %d\n\n", errors);
+    
     fclose(file);
 }

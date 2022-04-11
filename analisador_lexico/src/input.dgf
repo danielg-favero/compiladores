@@ -1,5 +1,5 @@
 programa test ;
-2var
+
 var
  v : inteiro ;
  i , max , juro : inteiro ;
@@ -14,7 +14,10 @@ inicio
     i := 1 ;
     { isso é um comentário
       de mais de uma
-      linha }
+      aaa
+      
+      
+       }
     enquanto i <= max { (1+juro) elevado a n } faca
     inicio
         valor := valor * ( 1 + juro ) ;
