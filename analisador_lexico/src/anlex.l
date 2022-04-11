@@ -66,12 +66,12 @@ real                             {inteiro}"."?{digito}?
 ">="                             { printf("<GEQTHAN, %d>", line); }
 "<>"                             { printf("<DIFF, %d>", line); }
 "ou"                             { printf("<OR, %d>", line); }
+"e"                              { printf("<AND, %d>", line); }
 
 "+"                              { printf("<PLUS, %d>", line); }
 "-"                              { printf("<MINUS, %d>", line); }
 "*"                              { printf("<MULT, %d>", line); }
 "div"                            { printf("<DIV, %d>", line); }
-"e"                              { printf("<EXP, %d>", line); }
 
 {id}                             { printf("<ID, %d>", line); }
 
