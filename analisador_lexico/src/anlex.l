@@ -80,12 +80,12 @@ real                             {inteiro}"."?{digito}?
 %%
 
 int main(){
-    char *inputFile = "input.dgf";
+    char *inputFile = "input";
 
     FILE *file = fopen(inputFile, "r");
 
     if(!file){
-        printf("\n\n* 📂 ARQUIVO '%s' NÃO ENCONTRADO\n\n", inputFile);
+        printf("\n\n*\033[0;31m\033[1m 📂 ARQUIVO '%s' NÃO ENCONTRADO\n\n", inputFile);
         return -1;
     }
 
@@ -95,6 +95,6 @@ int main(){
     printf("\033[0;37m*\033[0;33m\033[1m ✅ LISTA DE TOKENS GERADA: \033[0;37m \033[0m\n");
     yylex();
     printf("\n*\033[0;31m\033[1m ❌ ERROS LÉXICOS ENCONTRADOS: %d\n\n", errors);
-    
+
     fclose(file);
 }
