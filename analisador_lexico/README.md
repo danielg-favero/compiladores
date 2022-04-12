@@ -9,11 +9,17 @@ sudo apt-get update
 sudo apt-get install flex
 ```
 
-Em seguida, providencie um arquivo de entrada em `analisador_lexico/src` e altere o nome do arquivo de entrada dentro do arquivo `analisador_lexico/src/anlex.l`:
+
+
+### Rodando a analisador
+
+Providencie um arquivo de entrada em `analisador_lexico/src` e altere o nome do arquivo de entrada dentro do arquivo `analisador_lexico/src/anlex.l`:
 
 ```c
 char *inputFile = "nome_do_arquivo";
 ```
+
+#### Primeira forma:
 
 Adiciona o segunite alias nas configurações do seu terminal:
 
@@ -27,14 +33,14 @@ Para executar o analisador execute o comando dentro da raiz do projeto:
 lexicgen
 ```
 
+#### Segunda forma:
 
+Dentro do diretoria raiz do projeto rode no terminal:
 
-### Resultados esperados
+```bash
+cd analisador_lexico/src
+flex anlex.l
+gcc lex.yy.c -o output -lft
+./output
+```
 
-1 - Arquivo fonte não encontrado:
-
-![image-20220411163337884](/home/user/.config/Typora/typora-user-images/image-20220411163337884.png)
-
-2 - Execução concluída com sucesso:
-
-![image-20220411163421727](/home/user/.config/Typora/typora-user-images/image-20220411163421727.png)
