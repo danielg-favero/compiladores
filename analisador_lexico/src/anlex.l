@@ -12,7 +12,7 @@
 /* Declaração de expressões regulares */
 
 id                               [a-zA-Z_][a-zA-Z0-9_]*
-natural                          [1-9][1-9]*
+natural                          [1-9][0-9]*
 digito                           [0-9]*
 inteiro                          "-"?{digito}
 real                             {inteiro}"."?{digito}?
@@ -20,9 +20,9 @@ real                             {inteiro}"."?{digito}?
 /* Validação das expressões regulares */
 
 %%
-\n                               { line++; printf("\n"); }
+\n                               { line++; }
 \t                               { /* IGNORAR TABULAÇÃO */ }
-[ ]                              { /* IGNORAR ESPAÇOS EM BRANCO */ }
+[[:space:]]                      { /* IGNORAR ESPAÇOS EM BRANCO */ }
 "{".*"}"                         { /* IGNORAR COMENTÁRIO DE UM LINHA */ }
 "{"[^}]*"}"                      { line += countCharacter(yytext, '\n'); /* IGNORAR COMENTÁRIO MULTILINHA */ }
 
@@ -77,10 +77,11 @@ real                             {inteiro}"."?{digito}?
 
 .                                { errors++; printf("<ERROR, %d>", line); }
 ([0-9]*[a-zA-Z_]+[0-9]*)+        { errors++; printf("<ERROR, %d>", line); }
+{id}[^(\n\t[:space:])]+                { errors++; printf("<ERROR, %d>", line); }
 %%
 
 int main(){
-    char *inputFile = "input.dgf";
+    char *inputFile = "teste1.s";
 
     FILE *file = fopen(inputFile, "r");
 
