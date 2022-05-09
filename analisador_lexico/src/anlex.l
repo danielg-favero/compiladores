@@ -47,6 +47,11 @@ real                             {inteiro}"."?{digito}?
 "real"                           { printf("<FLOAT, %d>", line); }
 "booleano"                       { printf("<BOOL, %d>", line); }
 
+"+"                              { printf("<PLUS, %d>", line); }
+"*"                              { printf("<MULT, %d>", line); }
+"-"                              { printf("<MINUS, %d>", line); }
+"div"                            { printf("<DIV, %d>", line); }
+
 {natural}                        { printf("<NUM, %d>", line); }                   
 {inteiro}                        { printf("<NUM, %d>", line); }
 {real}                           { printf("<NUM, %d>", line); }
@@ -68,11 +73,6 @@ real                             {inteiro}"."?{digito}?
 "ou"                             { printf("<OR, %d>", line); }
 "e"                              { printf("<AND, %d>", line); }
 
-"+"                              { printf("<PLUS, %d>", line); }
-"-"                              { printf("<MINUS, %d>", line); }
-"*"                              { printf("<MULT, %d>", line); }
-"div"                            { printf("<DIV, %d>", line); }
-
 {id}                             { printf("<ID, %d>", line); }
 
 .                                { errors++; printf("<ERROR, %d>", line); }
@@ -80,8 +80,8 @@ real                             {inteiro}"."?{digito}?
 {id}[^(\n\t[:space:])]+                { errors++; printf("<ERROR, %d>", line); }
 %%
 
-int main(){
-    char *inputFile = "teste1.s";
+int main(int argc, char *argv[]){
+    char *inputFile = argv[1];
 
     FILE *file = fopen(inputFile, "r");
 

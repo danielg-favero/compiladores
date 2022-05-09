@@ -2,5 +2,5 @@ clear
 cd analisador_lexico/src
 flex anlex.l
 gcc lex.yy.c -o output -lfl
-./output
+./output $1
 cd ../..
