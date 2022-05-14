@@ -4,6 +4,8 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "./utils/countCharacter/countCharacter.c"
+    #include "y.tab.h"
+    extern int yylval;
 
     int line = 1;
     int errors = 0;
@@ -26,61 +28,61 @@ real                             {inteiro}"."?{digito}?
 "{".*"}"                         { /* IGNORAR COMENTÁRIO DE UM LINHA */ }
 "{"[^}]*"}"                      { line += countCharacter(yytext, '\n'); /* IGNORAR COMENTÁRIO MULTILINHA */ }
 
-"programa"                       { printf("<PROG, %d>", line); }
-"inicio"                         { printf("<BEGGIN, %d>", line); }
-"fim"                            { printf("<END, %d>", line); }
+"programa"                       { yylval = yytext[0]; return PROG; }
+"inicio"                         { yylval = yytext[0]; return START; }
+"fim"                            { yylval = yytext[0]; return END; }
 
-"var"                            { printf("<VAR, %d>", line); }
-":="                             { printf("<ATRIB, %d>", line); }
-":"                              { printf("<DOUBDOT, %d>", line); }
-";"                              { printf("<SEMICON, %d>", line); }
-","                              { printf("<COL, %d>", line); }
+"var"                            { yylval = yytext[0]; return VAR; }
+":="                             { yylval = yytext[0]; return ATRIB; }
+":"                              { yylval = yytext[0]; return DOUBDOT; }
+";"                              { yylval = yytext[0]; return SEMICON; }
+","                              { yylval = yytext[0]; return COL; }
 
-"se"                             { printf("<IF, %d>", line); }
-"senao"                          { printf("<ELIF, %d>", line); }
-"entao"                          { printf("<THEN, %d>", line); }
+"se"                             { yylval = yytext[0]; return IF; }
+"senao"                          { yylval = yytext[0]; return ELIF; }
+"entao"                          { yylval = yytext[0]; return THEN; }
 
-"enquanto"                       { printf("<WHILE, %d>", line); }
-"faca"                           { printf("<DO, %d>", line); }
+"enquanto"                       { yylval = yytext[0]; return WHILE; }
+"faca"                           { yylval = yytext[0]; return DO; }
 
-"inteiro"                        { printf("<INT, %d>", line); }
-"real"                           { printf("<FLOAT, %d>", line); }
-"booleano"                       { printf("<BOOL, %d>", line); }
+"inteiro"                        { yylval = yytext[0]; return INT; }
+"real"                           { yylval = yytext[0]; return FLOAT; }
+"booleano"                       { yylval = yytext[0]; return BOOL; }
 
-"+"                              { printf("<PLUS, %d>", line); }
-"*"                              { printf("<MULT, %d>", line); }
-"-"                              { printf("<MINUS, %d>", line); }
-"div"                            { printf("<DIV, %d>", line); }
+"+"                              { yylval = yytext[0]; return PLUS; }
+"*"                              { yylval = yytext[0]; return MULT; }
+"-"                              { yylval = yytext[0]; return MINUS; }
+"div"                            { yylval = yytext[0]; return DIV; }
 
-{natural}                        { printf("<NUM, %d>", line); }                   
-{inteiro}                        { printf("<NUM, %d>", line); }
-{real}                           { printf("<NUM, %d>", line); }
-"verdadeiro"                     { printf("<TRUE, %d>", line); }
-"falso"                          { printf("<FALSE, %d>", line); }
-"nao"                            { printf("<NOT, %d>", line); }
+{natural}                        { yylval = yytext[0]; return NUM; }
+{inteiro}                        { yylval = yytext[0]; return NUM; }
+{real}                           { yylval = yytext[0]; return NUM; }
+"verdadeiro"                     { yylval = yytext[0]; return TRUE; }
+"falso"                          { yylval = yytext[0]; return FALSE; }
+"nao"                            { yylval = yytext[0]; return NOT; }
 
-"leia"                           { printf("<READ, %d>", line); }
-"escreva"                        { printf("<WRITE, %d>", line); }
-"("                              { printf("<OPPAR, %d>", line); }
-")"                              { printf("<CLOPAR, %d>", line); }
+"leia"                           { yylval = yytext[0]; return READ; }
+"escreva"                        { yylval = yytext[0]; return WRITE; }
+"("                              { yylval = yytext[0]; return OPPAR; }
+")"                              { yylval = yytext[0]; return CLOPAR; }
 
-"="                              { printf("<EQ, %d>", line); }
-"<"                              { printf("<LTHAN, %d>", line); }
-">"                              { printf("<GTHAN, %d>", line); }
-"<="                             { printf("<LEQTHAN, %d>", line); }
-">="                             { printf("<GEQTHAN, %d>", line); }
-"<>"                             { printf("<DIFF, %d>", line); }
-"ou"                             { printf("<OR, %d>", line); }
-"e"                              { printf("<AND, %d>", line); }
+"="                              { yylval = yytext[0]; return EQ; }
+"<"                              { yylval = yytext[0]; return LTHAN; }
+">"                              { yylval = yytext[0]; return GTHAN; }
+"<="                             { yylval = yytext[0]; return LEQTHAN; }
+">="                             { yylval = yytext[0]; return GEQTHAN; }
+"<>"                             { yylval = yytext[0]; return DIFF; }
+"ou"                             { yylval = yytext[0]; return OR; }
+"e"                              { yylval = yytext[0]; return AND; }
 
-{id}                             { printf("<ID, %d>", line); }
+{id}                             { yylval = yytext[0]; return ID; }
 
-.                                { errors++; printf("<ERROR, %d>", line); }
-([0-9]*[a-zA-Z_]+[0-9]*)+        { errors++; printf("<ERROR, %d>", line); }
-{id}[^(\n\t[:space:])]+                { errors++; printf("<ERROR, %d>", line); }
+.                                { errors++; yylval = yytext[0]; return ERROR; }
+([0-9]*[a-zA-Z_]+[0-9]*)+        { errors++; yylval = yytext[0]; return ERROR; }
+{id}[^(\n\t[:space:])]+                { errors++; yylval = yytext[0]; return ERROR; }
 %%
 
-int main(int argc, char *argv[]){
+/* int main(int argc, char *argv[]){
     char *inputFile = argv[1];
 
     FILE *file = fopen(inputFile, "r");
@@ -98,4 +100,4 @@ int main(int argc, char *argv[]){
     printf("\n*\033[0;31m\033[1m ❌ ERROS LÉXICOS ENCONTRADOS: %d\n\n", errors);
 
     fclose(file);
-}
+} */

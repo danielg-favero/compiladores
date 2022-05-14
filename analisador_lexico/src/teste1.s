@@ -15,6 +15,6 @@ inicio
 valor := valor * ( 1.0 + juro ) ;
 i := i + 1 ;
 fim
-escreva ( v@lor ) ;
+escreva ( valor ) ;
 fim
 fim
