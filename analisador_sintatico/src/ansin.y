@@ -2,10 +2,10 @@
     #include <stdio.h>
     #include <stdlib.h>
 
-    int yylex();
-
-    int yylval;
+    extern void yyerror(char const *message);
+    extern int yylex(void);
     extern FILE *yyin;
+    extern int lexical_errors;
 %}
 
 %token  PROG 
@@ -45,7 +45,6 @@
         OR
         AND
         ID
-        ERROR
 %right NOT
 %left MULT DIV
 %left MINUS PLUS
@@ -54,29 +53,78 @@
 %left TRUE FALSE
 %right ATRIB
 
+%start programa
+
 /* GLC DA LINGUAGEM SMALL L */
 %%
-P : PROG IDENT SEMICON B;                               ;
-B : VAR D START CS END;
-D : NV DOUBDOT T SEMICON | NV DOUBDOT T SEMICON D;
-NV : IDENT | IDENT COL NV;
-T : INT | FLOAT | BOOL;
-CS : C | C SEMICON CS;
-C : A | I | F | R | W;
-A : IDENT ATRIB E;
-I : IF E THEN CS | IF E THEN CS ELIF CS;
-F : WHILE E DO CS;
-R : READ OPPAR IDENT CLOPAR;
-W : WRITE OPPAR IDENT CLOPAR;
-E : S | S RO S;
-RO : DIFF | EQ | LTHAN | GTHAN | LEQTHAN | GEQTHAN;
-S : TE O TE | TE;
-O : PLUS | MINUS | OR;
-TE : FA | FA OP FA;
-OP : MULT | DIV | AND;
-FA : IDENT | N | OPPAR E CLOPAR | TRUE | FALSE | NOT FA;
-IDENT : ID;
-N : NUM;   
+programa : PROG id SEMICON bloco                            { printf("PROGRAMA -> programa ID ; BLOCO \n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n\n"); };
+
+bloco : VAR declaracao START comandos END                   { printf("BLOCO -> var DECLARACAO inicio COMANDOS fim \n"); };
+
+declaracao : nome_var DOUBDOT tipo SEMICON                  { printf("DECLARACAO -> nome_var : tipo ; \n"); };                            
+             | nome_var DOUBDOT tipo SEMICON declaracao     { printf("DECLARACAO -> nome_var : tipo ; DECLARACAO \n"); };
+
+nome_var : id                                               { printf("NOME_VAR -> ID \n"); };
+           | id COL nome_var                                { printf("NOME_VAR -> ID , NOME_VAR \n"); };
+
+tipo : INT                                                  { printf("TIPO -> inteiro \n"); };            
+       | FLOAT                                              { printf("TIPO -> real \n"); }; 
+       | BOOL                                               { printf("TIPO -> booleano \n"); }; 
+
+comandos : comando                                          { printf("COMANDOS -> COMANDO \n"); };
+           | comando SEMICON comandos                       { printf("COMANDOS -> COMANDO ; COMANDOS \n"); };
+
+comando : atribuicao                                        { printf("COMANDO -> ATRIBUICAO \n"); };
+          | condicional                                     { printf("COMANDO -> CONDICIONAL \n"); };
+          | enquanto                                        { printf("COMANDO -> ENQUANTO \n"); };
+          | leitura                                         { printf("COMANDO -> LEITURA \n"); };
+          | escrita                                         { printf("COMANDO -> ESCRITA \n"); };
+
+atribuicao : id ATRIB expressao                             { printf("ATRIBUICAO -> ID := EXPRESSAO \n"); };
+
+condicional : IF expressao THEN comandos                    { printf("CONDICIONAL -> se EXPRESSAO entao COMANDOS \n"); };
+              | IF expressao THEN comandos ELIF comandos    { printf("CONDICIONAL -> se EXPRESSAO entao COMANDOS senao COMANDOS \n"); };
+
+enquanto : WHILE expressao DO comandos                      { printf("ENQUANTO -> enquanto EXPRESSAO faca COMANDOS \n"); };
+
+leitura : READ OPPAR id CLOPAR                              { printf("LEITURA -> leia ( ID ) \n"); };
+
+escrita : WRITE OPPAR id CLOPAR                             { printf("ESCRITA -> escreva ( ID ) \n"); };
+
+expressao : simples                                         { printf("EXPRESSAO -> SIMPLES \n"); };
+            | simples op_relacional simples                 { printf("EXPRESSAO -> SIMPLES OP_RELACIONAL SIMPLES \n"); };
+
+op_relacional : DIFF                                        { printf("OP_RELACIONAL -> <> \n"); };
+                | EQ                                        { printf("OP_RELACIONAL -> = \n"); };
+                | LTHAN                                     { printf("OP_RELACIONAL -> < \n"); };
+                | GTHAN                                     { printf("OP_RELACIONAL -> > \n"); };
+                | LEQTHAN                                   { printf("OP_RELACIONAL -> <= \n"); };
+                | GEQTHAN                                   { printf("OP_RELACIONAL -> => \n"); };
+
+simples : termo operador termo                              { printf("SIMPLES -> TERMO OPERADOR TERMO \n"); };
+          | termo                                           { printf("SIMPLES -> TERMO \n"); };
+
+operador : PLUS                                             { printf("OPERADOR -> + \n"); };
+           | MINUS                                          { printf("OPERADOR -> - \n"); };
+           | OR                                             { printf("OPERADOR -> ou \n"); };
+
+termo : fator                                               { printf("TERMO -> FATOR \n"); };
+        | fator op fator                                    { printf("TERMO -> FATOR OP FATOR \n"); };
+
+op : MULT                                                   { printf("OP -> * \n"); };
+     | DIV                                                  { printf("OP -> div \n"); };
+     | AND                                                  { printf("OP -> e \n"); };
+
+fator : id                                                  { printf("FATOR -> ID \n"); };
+        | numero                                            { printf("FATOR -> NUMERO \n"); };
+        | OPPAR expressao CLOPAR                            { printf("FATOR -> ( EXPRESSAO ) \n"); };
+        | TRUE                                              { printf("FATOR -> verdadeiro \n"); };
+        | FALSE                                             { printf("FATOR -> falso \n"); };
+        | NOT fator                                         { printf("FATOR -> nao FATOR \n"); };
+
+id : ID                                                     { printf("ID -> id \n"); };
+
+numero : NUM                                                { printf("NUMERO -> numero \n"); };
 %%
 
 int main(int argc, char *argv[]){
@@ -91,9 +139,14 @@ int main(int argc, char *argv[]){
 
     yyin = file;
 
-    yyparse();
-    return 0;
+    int result_code = yyparse();
+    fclose(yyin);
+
+    return result_code;
 }
 
-void yyerror(const char *s){ printf("\nERROR: %s\n", s); }
+void yyerror(const char *s){ 
+    printf("\n\033[0;31m\033[1m ❌ ERRO: %s\n", s);
+    printf(" ❌ ERROS LÉXICOS ENCONTRADOS: %d\n\n", lexical_errors);
+}
 int yywrap(){ return 1; }
