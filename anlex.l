@@ -3,7 +3,7 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include "./utils/countCharacter/countCharacter.c"
+    #include "countCharacter.c"
     #include "y.tab.h"
     extern int yylval;
 
@@ -23,9 +23,9 @@ real                             {inteiro}"."?{digito}?
 
 %%
 \n                               { line++; }
-\t                               { /* IGNORAR TABULAÇÃO */ }
-[[:space:]]                      { /* IGNORAR ESPAÇOS EM BRANCO */ }
-"{".*"}"                         { /* IGNORAR COMENTÁRIO DE UM LINHA */ }
+\t                               ;
+[[:space:]]                      ;
+"{".*"}"                         ;
 "{"[^}]*"}"                      { line += countCharacter(yytext, '\n'); /* IGNORAR COMENTÁRIO MULTILINHA */ }
 
 "programa"                       { yylval = yytext[0]; return PROG; }
