@@ -1,4 +1,4 @@
-@ programa fatorial ;
+programa fatorial ;
 
 var
     i , fat , n : inteiro ;
@@ -9,8 +9,8 @@ inicio
     fat := 1 ;
 
     enquanto ( i <= n ) faca
-    fat := fat * i ;
-    i := i + 1 ;
+        fat := fat * i ;
+        i := i + 1 ;
     
-    escreva ( valor ) ;
+    escreva ( valor ) 
 fim

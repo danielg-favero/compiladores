@@ -1,11 +1,14 @@
 programa maior ;
+
 var
  x , y : inteiro ;
- inicio
+
+inicio
  leia ( x ) ;
  leia ( y ) ;
+
  se ( x <= y ) entao
- escreva ( x )
+    escreva ( x )
  senao
- escreva ( y )
+    escreva ( y )
 fim

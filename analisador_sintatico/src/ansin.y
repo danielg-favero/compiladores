@@ -57,74 +57,97 @@
 
 /* GLC DA LINGUAGEM SMALL L */
 %%
-programa : PROG id SEMICON bloco                            { printf("PROGRAMA -> programa ID ; BLOCO \n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n\n"); };
+programa : PROG id SEMICON bloco                                    { printf("PROGRAMA -> programa ID ; BLOCO \n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n\n"); };
 
-bloco : VAR declaracao START comandos END                   { printf("BLOCO -> var DECLARACAO inicio COMANDOS fim \n"); };
+bloco : VAR declaracao START comandos END                           { printf("BLOCO -> var DECLARACAO inicio COMANDOS fim \n"); };
 
-declaracao : nome_var DOUBDOT tipo SEMICON                  { printf("DECLARACAO -> nome_var : tipo ; \n"); };                            
-             | nome_var DOUBDOT tipo SEMICON declaracao     { printf("DECLARACAO -> nome_var : tipo ; DECLARACAO \n"); };
+declaracao : 
+    nome_var DOUBDOT tipo SEMICON                                   { printf("DECLARACAO -> nome_var : tipo ; \n"); };                            
+    | nome_var DOUBDOT tipo SEMICON declaracao                      { printf("DECLARACAO -> nome_var : tipo ; DECLARACAO \n"); };
 
-nome_var : id                                               { printf("NOME_VAR -> ID \n"); };
-           | id COL nome_var                                { printf("NOME_VAR -> ID , NOME_VAR \n"); };
+nome_var : 
+    id                                                              { printf("NOME_VAR -> ID \n"); };
+    | id COL nome_var                                               { printf("NOME_VAR -> ID , NOME_VAR \n"); };
 
-tipo : INT                                                  { printf("TIPO -> inteiro \n"); };            
-       | FLOAT                                              { printf("TIPO -> real \n"); }; 
-       | BOOL                                               { printf("TIPO -> booleano \n"); }; 
+tipo : 
+    INT                                                             { printf("TIPO -> inteiro \n"); };            
+    | FLOAT                                                         { printf("TIPO -> real \n"); }; 
+    | BOOL                                                          { printf("TIPO -> booleano \n"); }; 
 
-comandos : comando                                          { printf("COMANDOS -> COMANDO \n"); };
-           | comando SEMICON comandos                       { printf("COMANDOS -> COMANDO ; COMANDOS \n"); };
+comandos : 
+    comando                                                         { printf("COMANDOS -> COMANDO \n"); };
+    | comando SEMICON comandos                                      { printf("COMANDOS -> COMANDO ; COMANDOS \n"); };
 
-comando : atribuicao                                        { printf("COMANDO -> ATRIBUICAO \n"); };
-          | condicional                                     { printf("COMANDO -> CONDICIONAL \n"); };
-          | enquanto                                        { printf("COMANDO -> ENQUANTO \n"); };
-          | leitura                                         { printf("COMANDO -> LEITURA \n"); };
-          | escrita                                         { printf("COMANDO -> ESCRITA \n"); };
+comando: 
+    comando_combinado                                               { printf("COMANDO -> COMANDO_COMBINADO \n"); };
+    | comando_aberto                                                { printf("COMANDO -> COMANDO_ABERTO \n"); };
 
-atribuicao : id ATRIB expressao                             { printf("ATRIBUICAO -> ID := EXPRESSAO \n"); };
+comando_combinado :
+    IF expressao THEN comando_combinado ELIF comando_combinado      { printf("COMANDO_COMBINADO -> se EXPRESSAO entao COMANDO_COMBINADO senao COMANDO_COMBINADO \n"); };
+    | atribuicao                                                    { printf("COMANDO_COMBINADO -> ATRIBUICAO \n"); };
+    | enquanto                                                      { printf("COMANDO_COMBINADO -> ENQUANTO \n"); };
+    | leitura                                                       { printf("COMANDO_COMBINADO -> LEITURA \n"); };
+    | escrita                                                       { printf("COMANDO_COMBINADO -> ESCRITA \n"); };
 
-condicional : IF expressao THEN comandos                    { printf("CONDICIONAL -> se EXPRESSAO entao COMANDOS \n"); };
-              | IF expressao THEN comandos ELIF comandos    { printf("CONDICIONAL -> se EXPRESSAO entao COMANDOS senao COMANDOS \n"); };
+comando_aberto: 
+    IF expressao THEN comando                                       { printf("COMANDO_ABERTO -> se EXPRESSAO entao COMANDO \n"); }
+    | IF expressao THEN comando_combinado ELIF comando_aberto       { printf("COMANDO_ABERTO -> se EXPRESSAO entao COMANDO_COMBINADO senao COMANDO_ABERTO \n"); };
 
-enquanto : WHILE expressao DO comandos                      { printf("ENQUANTO -> enquanto EXPRESSAO faca COMANDOS \n"); };
+atribuicao : 
+    id ATRIB expressao                                              { printf("ATRIBUICAO -> ID := EXPRESSAO \n"); };
 
-leitura : READ OPPAR id CLOPAR                              { printf("LEITURA -> leia ( ID ) \n"); };
+enquanto : 
+    WHILE expressao DO comando_combinado                            { printf("ENQUANTO -> enquanto EXPRESSAO faca COMANDOS \n"); };
 
-escrita : WRITE OPPAR id CLOPAR                             { printf("ESCRITA -> escreva ( ID ) \n"); };
+leitura : 
+    READ OPPAR id CLOPAR                                            { printf("LEITURA -> leia ( ID ) \n"); };
 
-expressao : simples                                         { printf("EXPRESSAO -> SIMPLES \n"); };
-            | simples op_relacional simples                 { printf("EXPRESSAO -> SIMPLES OP_RELACIONAL SIMPLES \n"); };
+escrita : 
+    WRITE OPPAR id CLOPAR                                           { printf("ESCRITA -> escreva ( ID ) \n"); };
 
-op_relacional : DIFF                                        { printf("OP_RELACIONAL -> <> \n"); };
-                | EQ                                        { printf("OP_RELACIONAL -> = \n"); };
-                | LTHAN                                     { printf("OP_RELACIONAL -> < \n"); };
-                | GTHAN                                     { printf("OP_RELACIONAL -> > \n"); };
-                | LEQTHAN                                   { printf("OP_RELACIONAL -> <= \n"); };
-                | GEQTHAN                                   { printf("OP_RELACIONAL -> => \n"); };
+expressao : 
+    simples                                                         { printf("EXPRESSAO -> SIMPLES \n"); }
+    | simples op_relacional simples                                 { printf("EXPRESSAO -> SIMPLES OP_RELACIONAL SIMPLES \n"); };
 
-simples : termo operador termo                              { printf("SIMPLES -> TERMO OPERADOR TERMO \n"); };
-          | termo                                           { printf("SIMPLES -> TERMO \n"); };
+op_relacional : 
+    DIFF                                                            { printf("OP_RELACIONAL -> <> \n"); }
+    | EQ                                                            { printf("OP_RELACIONAL -> = \n"); }
+    | LTHAN                                                         { printf("OP_RELACIONAL -> < \n"); }
+    | GTHAN                                                         { printf("OP_RELACIONAL -> > \n"); }
+    | LEQTHAN                                                       { printf("OP_RELACIONAL -> <= \n"); }
+    | GEQTHAN                                                       { printf("OP_RELACIONAL -> => \n"); };
 
-operador : PLUS                                             { printf("OPERADOR -> + \n"); };
-           | MINUS                                          { printf("OPERADOR -> - \n"); };
-           | OR                                             { printf("OPERADOR -> ou \n"); };
+simples : 
+    termo operador termo                                            { printf("SIMPLES -> TERMO OPERADOR TERMO \n"); }
+    | termo                                                         { printf("SIMPLES -> TERMO \n"); };
 
-termo : fator                                               { printf("TERMO -> FATOR \n"); };
-        | fator op fator                                    { printf("TERMO -> FATOR OP FATOR \n"); };
+operador : 
+    PLUS                                                            { printf("OPERADOR -> + \n"); }
+    | MINUS                                                         { printf("OPERADOR -> - \n"); }
+    | OR                                                            { printf("OPERADOR -> ou \n"); };
 
-op : MULT                                                   { printf("OP -> * \n"); };
-     | DIV                                                  { printf("OP -> div \n"); };
-     | AND                                                  { printf("OP -> e \n"); };
+termo : 
+    fator                                                           { printf("TERMO -> FATOR \n"); }
+    | fator op fator                                                { printf("TERMO -> FATOR OP FATOR \n"); };
 
-fator : id                                                  { printf("FATOR -> ID \n"); };
-        | numero                                            { printf("FATOR -> NUMERO \n"); };
-        | OPPAR expressao CLOPAR                            { printf("FATOR -> ( EXPRESSAO ) \n"); };
-        | TRUE                                              { printf("FATOR -> verdadeiro \n"); };
-        | FALSE                                             { printf("FATOR -> falso \n"); };
-        | NOT fator                                         { printf("FATOR -> nao FATOR \n"); };
+op : 
+    MULT                                                            { printf("OP -> * \n"); }
+    | DIV                                                           { printf("OP -> div \n"); }
+    | AND                                                           { printf("OP -> e \n"); };
 
-id : ID                                                     { printf("ID -> id \n"); };
+fator : 
+    id                                                              { printf("FATOR -> ID \n"); }
+    | numero                                                        { printf("FATOR -> NUMERO \n"); }
+    | OPPAR expressao CLOPAR                                        { printf("FATOR -> ( EXPRESSAO ) \n"); }
+    | TRUE                                                          { printf("FATOR -> verdadeiro \n"); }
+    | FALSE                                                         { printf("FATOR -> falso \n"); }
+    | NOT fator                                                     { printf("FATOR -> nao FATOR \n"); };
 
-numero : NUM                                                { printf("NUMERO -> numero \n"); };
+id : 
+    ID                                                              { printf("ID -> id \n"); };
+
+numero : 
+    NUM                                                             { printf("NUMERO -> numero \n"); };
 %%
 
 int main(int argc, char *argv[]){
