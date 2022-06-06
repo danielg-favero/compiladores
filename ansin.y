@@ -57,7 +57,7 @@
 
 /* GLC DA LINGUAGEM SMALL L */
 %%
-programa : PROG id SEMICON bloco                                    { printf("PROGRAMA -> programa ID ; BLOCO \n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n\n"); };
+programa : PROG id SEMICON bloco                                    { printf("PROGRAMA -> programa ID ; BLOCO \n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n"); };
 
 bloco : VAR declaracao START comandos END                           { printf("BLOCO -> var DECLARACAO inicio COMANDOS fim \n"); };
 
@@ -163,6 +163,7 @@ int main(int argc, char *argv[]){
     yyin = file;
 
     int result_code = yyparse();
+    printf("\n\033[0;31m\033[1m❌ ERROS LÉXICOS ENCONTRADOS: %d\n\n", lexical_errors);
     fclose(yyin);
 
     return result_code;
@@ -170,6 +171,5 @@ int main(int argc, char *argv[]){
 
 void yyerror(const char *s){ 
     printf("\n\033[0;31m\033[1m ❌ ERRO: %s\n", s);
-    printf(" ❌ ERROS LÉXICOS ENCONTRADOS: %d\n\n", lexical_errors);
 }
 int yywrap(){ return 1; }
