@@ -1,18 +1,19 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
 
     extern void yyerror(char const *message);
     extern int yylex(void);
     extern FILE *yyin;
     extern int lexical_errors;
-
-    #define YYSTYPE double
 %}
 
-%union{
-    double val;
-    char* lex_val;
+%union {
+    struct {
+        int val;
+        char* lex_val;
+    } attr;
 }
 
 %token  PROG 
@@ -31,11 +32,11 @@
         INT
         FLOAT
         BOOL
-        PLUS
-        MULT
-        MINUS
-        DIV
-        <val>NUM
+        <attr>PLUS
+        <attr>MULT
+        <attr>MINUS
+        <attr>DIV
+        <attr>NUM
         TRUE
         FALSE
         NOT
@@ -51,7 +52,7 @@
         DIFF
         OR
         AND
-        <lex_val>ID
+        <attr>ID
 %right NOT
 %left MULT DIV
 %left MINUS PLUS
@@ -60,61 +61,67 @@
 %left TRUE FALSE
 %right ATRIB
 
+%type <attr> numero fator termo simples expressao atribuicao id operador op
+/* %type <attr> NUM ID AND DIV MULT OR MINUS PLUS */
+
 %start programa
 
 /* GLC DA LINGUAGEM SMALL L */
 %%
 programa : PROG id SEMICON bloco                                    { printf("\n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n"); };
 
-bloco : VAR declaracao START comandos END                           { }
+bloco : VAR declaracao START comandos END                           { };
 
 declaracao : 
     nome_var DOUBDOT tipo SEMICON                                   { }
-    | nome_var DOUBDOT tipo SEMICON declaracao                      { }
+    | nome_var DOUBDOT tipo SEMICON declaracao                      { };
 
 nome_var : 
     id                                                              { }
-    | id COL nome_var                                               { }
+    | id COL nome_var                                               { };
 
 tipo : 
     INT                                                             { }
     | FLOAT                                                         { }
-    | BOOL                                                          { }
+    | BOOL                                                          { };
 
 comandos : 
     comando                                                         { }
-    | comando SEMICON comandos                                      { }
+    | comando SEMICON comandos                                      { };
 
 comando: 
     comando_combinado                                               { }
-    | comando_aberto                                                { }
+    | comando_aberto                                                { };
 
 comando_combinado :
     IF expressao THEN comando_combinado ELIF comando_combinado      { }
     | atribuicao                                                    { }
     | enquanto                                                      { }
     | leitura                                                       { }
-    | escrita                                                       { }
+    | escrita                                                       { };
 
 comando_aberto: 
     IF expressao THEN comando                                       { }
-    | IF expressao THEN comando_combinado ELIF comando_aberto       { }
+    | IF expressao THEN comando_combinado ELIF comando_aberto       { };
 
 atribuicao : 
-    id ATRIB expressao                                              { }
+    id ATRIB expressao                                              { 
+                                                                        $1.val = $3.val;
+                                                                        printf("%s = %d\n", $1.lex_val, $1.val);
+                                                                    };
 
 enquanto : 
-    WHILE expressao DO comando_combinado                            { }
+    WHILE expressao DO comando_combinado                            { };
 
 leitura : 
-    READ OPPAR id CLOPAR                                            { }
+    READ OPPAR id CLOPAR                                            { };
 
 escrita : 
-    WRITE OPPAR id CLOPAR                                           { printf("%f", $3); }
+    WRITE OPPAR id CLOPAR                                           { printf("%s = %d\n", $3.lex_val, $3.val); };
 
 expressao : 
-    simples                                                         { $$ = $1; }
-    | simples op_relacional simples                                 { }
+    simples                                                         { $$.val = $1.val; }
+    | simples op_relacional simples                                 { };
 
 op_relacional : 
     DIFF                                                            { }
@@ -122,48 +129,52 @@ op_relacional :
     | LTHAN                                                         { }
     | GTHAN                                                         { }
     | LEQTHAN                                                       { }
-    | GEQTHAN                                                       { }
+    | GEQTHAN                                                       { };
 
 simples : 
-    termo operador termo                                            { 
-                                                                        if($2 == '+') { 
-                                                                            $$ = $1 + $2;
+    termo operador termo                                            {
+                                                                        if(strcmp($2.lex_val, "+") == 0){
+                                                                            $$.val = $1.val + $3.val;
+                                                                        } else if(strcmp($2.lex_val, "-") == 0){
+                                                                            $$.val = $1.val - $3.val;
                                                                         }
                                                                     }
-    | termo                                                         { $$ = $1; }
+    | termo                                                         { $$.val = $1.val; };
 
 operador : 
-    PLUS                                                            { $$ = $1; }
-    | MINUS                                                         { $$ = $1; }
-    | OR                                                            { $$ = $1; }
+    PLUS                                                            { }
+    | MINUS                                                         { }
+    | OR                                                            { };
 
 termo : 
-    fator                                                           { $$ = $1; }
+    fator                                                           { $$.val = $1.val; }
     | fator op fator                                                { 
-                                                                            printf("%f", $2); 
-                                                                        if($2 == '*') {
-                                                                            $$ = $1 * $2;
+                                                                        if(strcmp($2.lex_val, "*") == 0){
+                                                                            $$.val = $1.val * $3.val;
+                                                                        } else if(strcmp($2.lex_val, "div") == 0){
+                                                                            $$.val = $1.val / $3.val;
                                                                         }
-                                                                    }
+                                                                    };
 
 op : 
-    MULT                                                            { $$ = $1; }
-    | DIV                                                           { $$ = $1; }
-    | AND                                                           { $$ = $1; }
+    MULT                                                            { }
+    | DIV                                                           { }
+    | AND                                                           { };
 
 fator : 
-    id                                                              { $$ = $1; }
-    | numero                                                        { $$ = $1; }
-    | OPPAR expressao CLOPAR                                        { $$ = $2; }
+    id                                                              { }
+    | numero                                                        { $$.val = $1.val; }
+    | OPPAR expressao CLOPAR                                        { $$.val = $2.val; }
     | TRUE                                                          { }
     | FALSE                                                         { }
-    | NOT fator                                                     { }
+    | NOT fator                                                     { };
 
 id : 
-    ID                                                              { $$ = $1; };
+    ID                                                              { $$.lex_val = $1.lex_val; /*printf("%s = %s\n", $$.lex_val, $1.lex_val);*/ };
 
 numero : 
-    NUM                                                             { $$.val = $1; };
+    NUM                                                             { $$.val = $1.val; };
+    
 %%
 
 int main(int argc, char *argv[]){

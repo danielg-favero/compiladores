@@ -2,8 +2,6 @@ programa teste1 ;
 var
  x , y : inteiro ;
  inicio
- x := 5 ;
- y := 10 ;
- x := x + x * y ;
-escreva ( y )
+ y := 5 * 16 ;
+ escreva ( y ) 
 fim

@@ -3,9 +3,10 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
     #include "./utils/countCharacter/countCharacter.c"
     #include "y.tab.h"
-    extern int yylval;
+    extern YYSTYPE yylval;
 
     int line = 1;
     int lexical_errors = 0;
@@ -28,54 +29,54 @@ real                             {inteiro}"."?{digito}?
 "{".*"}"                         { /* IGNORAR COMENTÁRIO DE UM LINHA */ }
 "{"[^}]*"}"                      { line += countCharacter(yytext, '\n'); /* IGNORAR COMENTÁRIO MULTILINHA */ }
 
-"programa"                       { yylval = yytext[0]; return PROG; }
-"inicio"                         { yylval = yytext[0]; return START; }
-"fim"                            { yylval = yytext[0]; return END; }
+"programa"                       { return PROG; }
+"inicio"                         { return START; }
+"fim"                            { return END; }
 
-"var"                            { yylval = yytext[0]; return VAR; }
-":="                             { yylval = yytext[0]; return ATRIB; }
-":"                              { yylval = yytext[0]; return DOUBDOT; }
-";"                              { yylval = yytext[0]; return SEMICON; }
-","                              { yylval = yytext[0]; return COL; }
+"var"                            { return VAR; }
+":="                             { return ATRIB; }
+":"                              { return DOUBDOT; }
+";"                              { return SEMICON; }
+","                              { return COL; }
 
-"se"                             { yylval = yytext[0]; return IF; }
-"senao"                          { yylval = yytext[0]; return ELIF; }
-"entao"                          { yylval = yytext[0]; return THEN; }
+"se"                             { return IF; }
+"senao"                          { return ELIF; }
+"entao"                          { return THEN; }
 
-"enquanto"                       { yylval = yytext[0]; return WHILE; }
-"faca"                           { yylval = yytext[0]; return DO; }
+"enquanto"                       { return WHILE; }
+"faca"                           { return DO; }
 
-"inteiro"                        { yylval = yytext[0]; return INT; }
-"real"                           { yylval = yytext[0]; return FLOAT; }
-"booleano"                       { yylval = yytext[0]; return BOOL; }
+"inteiro"                        { return INT; }
+"real"                           { return FLOAT; }
+"booleano"                       { return BOOL; }
 
-"+"                              { yylval = yytext[0]; return PLUS; }
-"*"                              { yylval = yytext[0]; return MULT; }
-"-"                              { yylval = yytext[0]; return MINUS; }
-"div"                            { yylval = yytext[0]; return DIV; }
+"+"                              { yylval.attr.lex_val = strdup(yytext); return PLUS; }
+"*"                              { yylval.attr.lex_val = strdup(yytext); return MULT; }
+"-"                              { yylval.attr.lex_val = strdup(yytext); return MINUS; }
+"div"                            { yylval.attr.lex_val = strdup(yytext); return DIV; }
 
-{natural}                        { yylval = yytext[0]; return NUM; }
-{inteiro}                        { yylval = yytext[0]; return NUM; }
-{real}                           { yylval = yytext[0]; return NUM; }
-"verdadeiro"                     { yylval = yytext[0]; return TRUE; }
-"falso"                          { yylval = yytext[0]; return FALSE; }
-"nao"                            { yylval = yytext[0]; return NOT; }
+{natural}                        { yylval.attr.val = atoi(yytext); return NUM; }
+{inteiro}                        { yylval.attr.val = atoi(yytext); return NUM; }
+{real}                           { yylval.attr.val = atoi(yytext); return NUM; }
+"verdadeiro"                     { return TRUE; }
+"falso"                          { return FALSE; }
+"nao"                            { return NOT; }
 
-"leia"                           { yylval = yytext[0]; return READ; }
-"escreva"                        { yylval = yytext[0]; return WRITE; }
-"("                              { yylval = yytext[0]; return OPPAR; }
-")"                              { yylval = yytext[0]; return CLOPAR; }
+"leia"                           { return READ; }
+"escreva"                        { return WRITE; }
+"("                              { return OPPAR; }
+")"                              { return CLOPAR; }
 
-"="                              { yylval = yytext[0]; return EQ; }
-"<"                              { yylval = yytext[0]; return LTHAN; }
-">"                              { yylval = yytext[0]; return GTHAN; }
-"<="                             { yylval = yytext[0]; return LEQTHAN; }
-">="                             { yylval = yytext[0]; return GEQTHAN; }
-"<>"                             { yylval = yytext[0]; return DIFF; }
-"ou"                             { yylval = yytext[0]; return OR; }
-"e"                              { yylval = yytext[0]; return AND; }
+"="                              { return EQ; }
+"<"                              { return LTHAN; }
+">"                              { return GTHAN; }
+"<="                             { return LEQTHAN; }
+">="                             { return GEQTHAN; }
+"<>"                             { return DIFF; }
+"ou"                             { return OR; }
+"e"                              { return AND; }
 
-{id}                             { yylval = yytext[0]; return ID; }
+{id}                             { yylval.attr.lex_val = strdup(yytext); return ID; }
 
 .                                { lexical_errors++; }
 ([0-9]*[a-zA-Z_]+[0-9]*)+        { lexical_errors++; }
