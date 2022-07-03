@@ -50,14 +50,14 @@ real                             {inteiro}"."?{digito}?
 "real"                           { return FLOAT; }
 "booleano"                       { return BOOL; }
 
-"+"                              { yylval.attr.lex_val = strdup(yytext); return PLUS; }
-"*"                              { yylval.attr.lex_val = strdup(yytext); return MULT; }
-"-"                              { yylval.attr.lex_val = strdup(yytext); return MINUS; }
-"div"                            { yylval.attr.lex_val = strdup(yytext); return DIV; }
+"+"                              { yylval.lex_val = yytext[0]; return PLUS; }
+"*"                              { yylval.lex_val = yytext[0]; return MULT; }
+"-"                              { yylval.lex_val = yytext[0]; return MINUS; }
+"div"                            { yylval.lex_val = yytext[0]; return DIV; }
 
-{natural}                        { yylval.attr.val = atoi(yytext); return NUM; }
-{inteiro}                        { yylval.attr.val = atoi(yytext); return NUM; }
-{real}                           { yylval.attr.val = atoi(yytext); return NUM; }
+{natural}                        { yylval.val = atoi(yytext); return NUM; }
+{inteiro}                        { yylval.val = atoi(yytext); return NUM; }
+{real}                           { yylval.val = atof(yytext); return NUM; }
 "verdadeiro"                     { return TRUE; }
 "falso"                          { return FALSE; }
 "nao"                            { return NOT; }
@@ -76,7 +76,7 @@ real                             {inteiro}"."?{digito}?
 "ou"                             { return OR; }
 "e"                              { return AND; }
 
-{id}                             { yylval.attr.lex_val = strdup(yytext); return ID; }
+{id}                             { yylval.lex_val = yytext[0]; return ID; }
 
 .                                { lexical_errors++; }
 ([0-9]*[a-zA-Z_]+[0-9]*)+        { lexical_errors++; }

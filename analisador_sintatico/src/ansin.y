@@ -7,13 +7,15 @@
     extern int yylex(void);
     extern FILE *yyin;
     extern int lexical_errors;
+
+    // memória utilizada para armazenar as variáveis durante a execução do programa
+    // nesse cenário todas as variáveis devem ser compostas por apenas uma letra
+    int memory[26];
 %}
 
 %union {
-    struct {
-        int val;
-        char* lex_val;
-    } attr;
+    int val;
+    char lex_val;
 }
 
 %token  PROG 
@@ -32,11 +34,11 @@
         INT
         FLOAT
         BOOL
-        <attr>PLUS
-        <attr>MULT
-        <attr>MINUS
-        <attr>DIV
-        <attr>NUM
+        PLUS
+        MULT
+        MINUS
+        DIV
+        NUM
         TRUE
         FALSE
         NOT
@@ -52,17 +54,16 @@
         DIFF
         OR
         AND
-        <attr>ID
-%right NOT
+        ID
+%left ATRIB
+%left PLUS MINUS
 %left MULT DIV
-%left MINUS PLUS
 %left LTHAN GTHAN LEQTHAN GEQTHAN
 %left EQ DIFF
 %left TRUE FALSE
-%right ATRIB
+%right NOT
 
-%type <attr> numero fator termo simples expressao atribuicao id operador op
-/* %type <attr> NUM ID AND DIV MULT OR MINUS PLUS */
+%type <val> numero fator termo simples expressao id
 
 %start programa
 
@@ -105,9 +106,8 @@ comando_aberto:
     | IF expressao THEN comando_combinado ELIF comando_aberto       { };
 
 atribuicao : 
-    id ATRIB expressao                                              { 
-                                                                        $1.val = $3.val;
-                                                                        printf("%s = %d\n", $1.lex_val, $1.val);
+    id ATRIB expressao                                              {
+                                                                       memory[$<lex_val>1 - 'a'] = $<val>3; 
                                                                     };
 
 enquanto : 
@@ -117,10 +117,14 @@ leitura :
     READ OPPAR id CLOPAR                                            { };
 
 escrita : 
-    WRITE OPPAR id CLOPAR                                           { printf("%s = %d\n", $3.lex_val, $3.val); };
+    WRITE OPPAR id CLOPAR                                           {
+                                                                        printf("%d\n", memory[$<lex_val>3 - 'a']);
+                                                                    };
 
 expressao : 
-    simples                                                         { $$.val = $1.val; }
+    simples                                                         {
+                                                                        $<val>$ = $<val>1;
+                                                                    }
     | simples op_relacional simples                                 { };
 
 op_relacional : 
@@ -133,13 +137,15 @@ op_relacional :
 
 simples : 
     termo operador termo                                            {
-                                                                        if(strcmp($2.lex_val, "+") == 0){
-                                                                            $$.val = $1.val + $3.val;
-                                                                        } else if(strcmp($2.lex_val, "-") == 0){
-                                                                            $$.val = $1.val - $3.val;
+                                                                        if($<lex_val>2 == '+') {
+                                                                            $<val>$ =  $<val>1 + $<val>3;
+                                                                        } else if($<lex_val>2 == '-') {
+                                                                            $<val>$ =  $<val>1 - $<val>3;
                                                                         }
                                                                     }
-    | termo                                                         { $$.val = $1.val; };
+    | termo                                                         {
+                                                                        $<val>$ = $<val>1;
+                                                                    };
 
 operador : 
     PLUS                                                            { }
@@ -147,12 +153,14 @@ operador :
     | OR                                                            { };
 
 termo : 
-    fator                                                           { $$.val = $1.val; }
+    fator                                                           {
+                                                                        $<val>$ = $<val>1;
+                                                                    }
     | fator op fator                                                { 
-                                                                        if(strcmp($2.lex_val, "*") == 0){
-                                                                            $$.val = $1.val * $3.val;
-                                                                        } else if(strcmp($2.lex_val, "div") == 0){
-                                                                            $$.val = $1.val / $3.val;
+                                                                        if($<lex_val>2 == '*') {
+                                                                            $<val>$ =  $<val>1 * $<val>3;
+                                                                        } else if($<lex_val>2 == 'd') {
+                                                                            $<val>$ =  $<val>1 / $<val>3;
                                                                         }
                                                                     };
 
@@ -162,18 +170,26 @@ op :
     | AND                                                           { };
 
 fator : 
-    id                                                              { }
-    | numero                                                        { $$.val = $1.val; }
-    | OPPAR expressao CLOPAR                                        { $$.val = $2.val; }
+    id                                                              { 
+                                                                        $<val>$ = memory[$<lex_val>1 - 'a'];
+                                                                    }
+    | numero                                                        {
+                                                                        $<val>$ = $<val>1;
+                                                                    }
+    | OPPAR expressao CLOPAR                                        {
+                                                                        $<val>$ = $<val>2;
+                                                                    }
     | TRUE                                                          { }
     | FALSE                                                         { }
     | NOT fator                                                     { };
 
 id : 
-    ID                                                              { $$.lex_val = $1.lex_val; /*printf("%s = %s\n", $$.lex_val, $1.lex_val);*/ };
+    ID                                                              { };
 
 numero : 
-    NUM                                                             { $$.val = $1.val; };
+    NUM                                                             {
+                                                                        $<val>$ = $<val>1;
+                                                                    };
     
 %%
 
