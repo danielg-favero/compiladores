@@ -1,6 +1,6 @@
 #include "memory.h"
 
-Slot *creatSlot(char* lex_val, int val) {
+Slot *createSlot(char* lex_val, int val) {
     Slot *slot = malloc(sizeof(Slot));
     slot->next = NULL;
     slot->id = lex_val;
@@ -52,11 +52,10 @@ int getID(Memory *m, char *lex_val) {
 
 int assignID(Memory *m, char *lex_val, int val) {
     Slot *aux;
-    int foundId = 0;
     
     // Caso 1: memória está vazia
     if (isEmpty(m)) {
-       m->head = creatSlot(lex_val, val);
+       m->head = createSlot(lex_val, val);
        return 1;
     } else {
         aux = m->head;
@@ -76,9 +75,23 @@ int assignID(Memory *m, char *lex_val, int val) {
         }
 
         // Caso 3: Atribuição de uma nova variável a memória
-        aux->next = creatSlot(lex_val, val);
+        aux->next = createSlot(lex_val, val);
         return 1;
     }
 
     return 0;
+}
+
+void clearMemory(Memory *m) {
+    Slot *aux;
+    
+    if(m != NULL){
+        while(!isEmpty(m)) {
+            aux = m->head;
+            m->head = m->head->next;
+            free(aux);
+        }
+
+        free(m);
+    }
 }

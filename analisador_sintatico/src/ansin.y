@@ -65,7 +65,10 @@
 
 /* GLC DA LINGUAGEM SMALL L */
 %%
-programa : PROG id SEMICON bloco                                    { printf("\n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n"); };
+programa : PROG id SEMICON bloco                                    { 
+                                                                        printf("\n\n\033[0;32m\033[1m🎉 ANÁLISE SINTÁTICA CONCLUÍDA:\033[0;37m \033[0mo código está sintaticamente correto\n");
+                                                                        clearMemory(memory);
+                                                                    };
 
 bloco : VAR declaracao START comandos END                           { };
 

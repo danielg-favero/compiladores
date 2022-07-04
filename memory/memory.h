@@ -18,7 +18,7 @@ struct Memory {
 Slot *creatSlot(char* lex_val, int val);
 Memory *createMemory(void);
 int isEmpty(Memory *l);
-void inserSlot(Memory *l, char* lex_val, int val);
 void printMemory(Memory *l);
 int assignID(Memory *m, char *lex_val, int val);
 int getID(Memory *l, char *lex_val);
+void clearMemory(Memory *m);
