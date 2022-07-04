@@ -1,21 +1,17 @@
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
+    #include "../../memory/memory.h"
 
     extern void yyerror(char const *message);
     extern int yylex(void);
     extern FILE *yyin;
     extern int lexical_errors;
 
-    // memória utilizada para armazenar as variáveis durante a execução do programa
-    // nesse cenário todas as variáveis devem ser compostas por apenas uma letra
-    int memory[26];
+    Memory *memory;
 %}
 
 %union {
     int val;
-    char lex_val;
+    char* lex_val;
 }
 
 %token  PROG 
@@ -107,7 +103,10 @@ comando_aberto:
 
 atribuicao : 
     id ATRIB expressao                                              {
-                                                                       memory[$<lex_val>1 - 'a'] = $<val>3; 
+                                                                       if(isEmpty(memory)){
+                                                                         memory = createMemory();
+                                                                       }
+                                                                       assignID(memory, $<lex_val>1, $<val>3);
                                                                     };
 
 enquanto : 
@@ -118,7 +117,7 @@ leitura :
 
 escrita : 
     WRITE OPPAR id CLOPAR                                           {
-                                                                        printf("%d\n", memory[$<lex_val>3 - 'a']);
+                                                                        printf("%d\n", getID(memory, $<lex_val>3));
                                                                     };
 
 expressao : 
@@ -137,9 +136,9 @@ op_relacional :
 
 simples : 
     termo operador termo                                            {
-                                                                        if($<lex_val>2 == '+') {
+                                                                        if(strcmp($<lex_val>2, "+") == 0) {
                                                                             $<val>$ =  $<val>1 + $<val>3;
-                                                                        } else if($<lex_val>2 == '-') {
+                                                                        } else if(strcmp($<lex_val>2, "-") == 0) {
                                                                             $<val>$ =  $<val>1 - $<val>3;
                                                                         }
                                                                     }
@@ -157,9 +156,9 @@ termo :
                                                                         $<val>$ = $<val>1;
                                                                     }
     | fator op fator                                                { 
-                                                                        if($<lex_val>2 == '*') {
+                                                                        if(strcmp($<lex_val>2, "*") == 0) {
                                                                             $<val>$ =  $<val>1 * $<val>3;
-                                                                        } else if($<lex_val>2 == 'd') {
+                                                                        } else if(strcmp($<lex_val>2, "div") == 0) {
                                                                             $<val>$ =  $<val>1 / $<val>3;
                                                                         }
                                                                     };
@@ -171,7 +170,7 @@ op :
 
 fator : 
     id                                                              { 
-                                                                        $<val>$ = memory[$<lex_val>1 - 'a'];
+                                                                        $<val>$ = getID(memory, $<lex_val>1);
                                                                     }
     | numero                                                        {
                                                                         $<val>$ = $<val>1;

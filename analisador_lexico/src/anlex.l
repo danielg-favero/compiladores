@@ -1,9 +1,6 @@
 %option noyywrap
 
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
     #include "./utils/countCharacter/countCharacter.c"
     #include "y.tab.h"
     extern YYSTYPE yylval;
@@ -50,10 +47,10 @@ real                             {inteiro}"."?{digito}?
 "real"                           { return FLOAT; }
 "booleano"                       { return BOOL; }
 
-"+"                              { yylval.lex_val = yytext[0]; return PLUS; }
-"*"                              { yylval.lex_val = yytext[0]; return MULT; }
-"-"                              { yylval.lex_val = yytext[0]; return MINUS; }
-"div"                            { yylval.lex_val = yytext[0]; return DIV; }
+"+"                              { yylval.lex_val = strdup(yytext); return PLUS; }
+"*"                              { yylval.lex_val = strdup(yytext); return MULT; }
+"-"                              { yylval.lex_val = strdup(yytext); return MINUS; }
+"div"                            { yylval.lex_val = strdup(yytext); return DIV; }
 
 {natural}                        { yylval.val = atoi(yytext); return NUM; }
 {inteiro}                        { yylval.val = atoi(yytext); return NUM; }
@@ -76,7 +73,7 @@ real                             {inteiro}"."?{digito}?
 "ou"                             { return OR; }
 "e"                              { return AND; }
 
-{id}                             { yylval.lex_val = yytext[0]; return ID; }
+{id}                             { yylval.lex_val = strdup(yytext); return ID; }
 
 .                                { lexical_errors++; }
 ([0-9]*[a-zA-Z_]+[0-9]*)+        { lexical_errors++; }
