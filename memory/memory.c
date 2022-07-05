@@ -46,8 +46,6 @@ int getID(Memory *m, char *lex_val) {
             aux = aux->next;
         }
     } 
-
-    return -1;
 }
 
 int assignID(Memory *m, char *lex_val, int val) {
@@ -79,7 +77,7 @@ int assignID(Memory *m, char *lex_val, int val) {
         return 1;
     }
 
-    return 0;
+    return -1;
 }
 
 void clearMemory(Memory *m) {
