@@ -1,5 +1,5 @@
 %{
-    #include "../../memory/memory.h"
+    #include "memory.h"
 
     extern void yyerror(char const *message);
     extern int yylex(void);

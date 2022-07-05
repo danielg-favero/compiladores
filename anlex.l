@@ -1,7 +1,7 @@
 %option noyywrap
 
 %{
-    #include "./utils/countCharacter/countCharacter.c"
+    #include "countCharacter.c"
     #include "y.tab.h"
     extern YYSTYPE yylval;
 
